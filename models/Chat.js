@@ -4,7 +4,7 @@ const ChatSchema = new mongoose.Schema({
     userId: {type: String, ref: 'User', required: true},
     userName: {type: String, required: true},
     name: {type: String, required: true},
-    message: [
+    messages: [
         {
             isImage: {type: Boolean, required: true},
             isPublished: {type: Boolean, default: false},
