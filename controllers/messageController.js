@@ -22,7 +22,7 @@ export const textMessageController = async (req, res)=>{
        isImage: false})
 
        const {choices} = await openai.chat.completions.create({
-    model: "gemini-2.0",
+    model: "gemini-2.5-flash",
     messages: [
         {
             role: "user",
