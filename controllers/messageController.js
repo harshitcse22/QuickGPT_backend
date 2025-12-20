@@ -100,4 +100,3 @@ export const imageMessageController = async (req, res)=>{
 }
 
 
-// API to get published images
