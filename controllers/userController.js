@@ -15,16 +15,20 @@ export const registerUser = async (req, res)=>{
     const {name, email, password} = req.body;
 
     try {
+        if(!name || !email || !password){
+            return res.json({success: false, message: 'Please provide all fields'})
+        }
+
         const userExists = await User.findOne({email})
 
         if(userExists){
-            return res.json({success: false, message: 'User already exists'})
+            return res.json({success: false, message: 'User already exists. Please login.'})
         }
 
         const user = await User.create({name,email,password})
 
         const token = generateToken(user._id)
-        res.json({success: true, token})
+        res.json({success: true, token, message: 'Account created successfully!'})
     } catch (error) {
         return res.json({success: false, message: error.message})
     }
@@ -35,17 +39,24 @@ export const registerUser = async (req, res)=>{
 export const loginUser = async (req,res)=>{
     const {email, password} = req.body;
     try {
-         const user = await User.findOne({email})
-
-        if(user){
-            const isMatch = await bcrypt.compare(password, user.password)
-               
-            if(isMatch){
-                const token = generateToken(user._id);
-                return res.json({success: true, token})
-            }
+        if(!email || !password){
+            return res.json({success: false, message: 'Please provide email and password'})
         }
-        return res.json({success: false, message: 'Invalid Credentials'})
+
+        const user = await User.findOne({email})
+
+        if(!user){
+            return res.json({success: false, message: 'User not found. Please register first.'})
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password)
+               
+        if(!isMatch){
+            return res.json({success: false, message: 'Incorrect password'})
+        }
+
+        const token = generateToken(user._id);
+        return res.json({success: true, token})
     } catch (error) {
         return res.json({success: false, message: error.message})
     }
