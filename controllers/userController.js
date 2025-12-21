@@ -80,7 +80,7 @@ export const getPublishedImages = async (req, res) =>{
             { $unwind: "$messages" },
             {
                 $match: {
-                    "messages.isImages": true,
+                    "messages.isImage": true,
                     "messages.isPublished": true
                 }
             },
