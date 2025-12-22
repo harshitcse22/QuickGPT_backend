@@ -1,5 +1,6 @@
 import Transaction from "../models/Transaction.js"
 import Stripe from "stripe";
+import User from "../models/User.js";
 
 const plans = [
      {
@@ -73,7 +74,7 @@ export const purchasePlan = async (req, res)=>{
                 },
                 ],
                    mode: 'payment',
-                   success_url: `${origin}/loading`,
+                   success_url: `${origin}/loading?session_id={CHECKOUT_SESSION_ID}`,
                    cancel_url: `${origin}`,
                    metadata:  {transactionId: transaction._id.toString(), appId: 'quickgpt'},
                    expires_at: Math.floor(Date.now() / 1000) + 30 * 60, // Expires in 30 minutes
@@ -83,5 +84,31 @@ export const purchasePlan = async (req, res)=>{
 
     } catch (error) {
         res.json({success: false, message: error.message})
+    }
+}
+
+// API controller to verify payment status
+export const verifyPayment = async (req, res) => {
+    try {
+        const {sessionId} = req.body;
+        const userId = req.user._id;
+
+        const session = await stripe.checkout.sessions.retrieve(sessionId);
+        
+        if(session.payment_status === 'paid'){
+            const {transactionId} = session.metadata;
+            const transaction = await Transaction.findOne({_id: transactionId, isPaid: false});
+            
+            if(transaction && transaction.userId.toString() === userId.toString()){
+                await User.updateOne({_id: userId}, {$inc: {credits: transaction.credits}});
+                transaction.isPaid = true;
+                await transaction.save();
+                return res.json({success: true, message: "Credits updated successfully"});
+            }
+        }
+        
+        res.json({success: false, message: "Payment not completed or already processed"});
+    } catch (error) {
+        res.json({success: false, message: error.message});
     }
 }
