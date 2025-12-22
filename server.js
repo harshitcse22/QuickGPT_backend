@@ -17,7 +17,10 @@ app.post('/api/stripe', express.raw({type: 'application/json'}),
 stripeWebhooks)
 
 // Middlewares
-app.use(cors())
+app.use(cors({
+    origin: 'https://quick-gpt-gamma-lyart.vercel.app',
+    credentials: true
+}))
 app.use(express.json())
 
 // Routes
