@@ -12,15 +12,16 @@ const app = express()
 
 await connectDB()
 
-// Stripe webhooks
+// Middlewares
+app.use(cors({
+    origin: ['https://quick-gpt-gamma-lyart.vercel.app', 'http://localhost:5173', 'http://localhost:3000'],
+    credentials: true
+}))
+
+// Stripe webhooks (must be before express.json())
 app.post('/api/stripe', express.raw({type: 'application/json'}),
 stripeWebhooks)
 
-// Middlewares
-app.use(cors({
-    origin: 'https://quick-gpt-gamma-lyart.vercel.app',
-    credentials: true
-}))
 app.use(express.json())
 
 // Routes
