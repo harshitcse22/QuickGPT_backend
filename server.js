@@ -14,7 +14,7 @@ await connectDB()
 
 // Middlewares
 app.use(cors({
-    origin: ['https://quick-gpt-gamma-lyart.vercel.app', 'http://localhost:5173', 'http://localhost:3000'],
+    origin: ['https://quick-gpt-gamma-lyart.vercel.app'],
     credentials: true
 }))
 
